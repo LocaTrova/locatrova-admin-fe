@@ -1,0 +1,825 @@
+/* Room Search Page Styles */
+:root {
+  --primary-color: #3a86ff;
+  --primary-light: #8bb8ff;
+  --secondary-color: #6a67ce;
+  --accent-color: #ffbe0b;
+  --text-color: #333333;
+  --light-gray: #f5f7fa;
+  --medium-gray: #e9ecef;
+  --card-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+  --transition: all 0.3s ease;
+}
+
+.room-search-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  color: var(--text-color);
+}
+
+.page-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--secondary-color);
+  margin-bottom: 1.5rem;
+  text-align: center;
+  border-bottom: 2px solid var(--primary-light);
+  padding-bottom: 1rem;
+}
+
+/* Filters Section */
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+  background-color: var(--light-gray);
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: var(--card-shadow);
+}
+
+@media (min-width: 768px) {
+  .filters-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.filter-item {
+  margin-bottom: 1rem;
+}
+
+.filter-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--secondary-color);
+}
+
+.filter-select, .filter-input {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid var(--medium-gray);
+  font-size: 1rem;
+  transition: var(--transition);
+}
+
+.filter-select:focus, .filter-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-light);
+  outline: none;
+}
+
+.filter-checkbox-container {
+  margin-left: 10rem;
+  display: flex;
+  align-items: center;
+}
+
+.filter-checkbox {
+  appearance: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  background-color: white;
+  border: 1px solid var(--medium-gray);
+  border-radius: 4px;
+  transition: var(--transition);
+  display: inline-block;
+  position: relative;
+}
+
+.filter-checkbox:checked {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.filter-checkbox:checked::after {
+  content: '';
+  position: absolute;
+  top: 0.2rem;
+  left: 0.5rem;
+  width: 0.4rem;
+  height: 0.8rem;
+  border: solid white;
+  border-width: 0 0.2rem 0.2rem 0;
+  transform: rotate(45deg);
+}
+
+/* Services Section */
+.services-section {
+  margin-bottom: 2rem;
+  background-color: var(--light-gray);
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: var(--card-shadow);
+}
+
+.services-loading, .services-error {
+  padding: 0.75rem 1rem;
+  margin-top: 4px;
+  border-radius: 6px;
+  box-shadow: var(--card-shadow);
+  background-color: white;
+  width: 100%;
+  text-align: center;
+}
+
+.services-loading {
+  color: var(--secondary-color);
+}
+
+.services-error {
+  color: #e63946;
+}
+
+/* Loading and Error Containers */
+.loading-container,
+.error-container {
+  text-align: center;
+  padding: 2rem;
+  background-color: var(--light-gray);
+  border-radius: 8px;
+  margin: 2rem 0;
+  box-shadow: var(--card-shadow);
+}
+
+.loading-container {
+  color: var(--secondary-color);
+  font-weight: 600;
+}
+
+.error-container {
+  color: #e63946;
+  font-weight: 600;
+}
+
+/* Search Button */
+.search-button-container {
+  display: flex;
+  justify-content: center;
+  margin: 1.5rem 0 2.5rem;
+}
+
+.search-button {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 0.9rem 2.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: var(--card-shadow);
+}
+
+.search-button:hover {
+  background-color: var(--secondary-color);
+  transform: translateY(-2px);
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 8px 15px;
+}
+
+.search-button:active {
+  transform: translateY(0);
+}
+
+.services-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.service-tag {
+  background-color: var(--primary-color);
+  color: black;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: var(--transition);
+}
+
+.service-tag:hover {
+  background-color: var(--secondary-color);
+}
+
+.tag-remove-btn {
+  background: none;
+  border: none;
+  color: black;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+.services-input-container {
+  position: relative;
+}
+
+.services-input {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid var(--medium-gray);
+  font-size: 1rem;
+  transition: var(--transition);
+  background-color: white;
+  color: black;
+}
+
+.services-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-light);
+  outline: none;
+}
+
+.services-dropdown {
+  position: absolute;
+  z-index: 10;
+  background-color: white;
+  width: 100%;
+  margin-top: 4px;
+  border-radius: 6px;
+  box-shadow: var(--card-shadow);
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.service-option {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.service-option:hover {
+  background-color: var(--light-gray);
+}
+
+/* Results Section */
+.results-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--secondary-color);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.results-count {
+  background-color: var(--accent-color);
+  color: var(--text-color);
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.rooms-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .rooms-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .rooms-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.room-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  transition: var(--transition);
+  border: 1px solid var(--medium-gray);
+}
+
+.room-card:hover {
+  transform: translateY(-5px);
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 10px 20px;
+}
+
+.room-card-body {
+  padding: 1.5rem;
+}
+
+.room-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 0.8rem;
+}
+
+.room-info {
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.room-info strong {
+  font-weight: 600;
+  color: var(--secondary-color);
+}
+
+.room-services-title {
+  font-weight: 600;
+  color: var(--secondary-color);
+  margin-top: 0.8rem;
+  margin-bottom: 0.4rem;
+}
+
+.room-services-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.room-service-tag {
+  background-color: var(--light-gray);
+  border: 1px solid var(--medium-gray);
+  padding: 0.2rem 0.6rem;
+  border-radius: 16px;
+  font-size: 0.8rem;
+}
+
+.no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem;
+  background-color: var(--light-gray);
+  border-radius: 8px;
+  font-size: 1.1rem;
+  color: var(--text-color);
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease forwards;
+}
+
+/* Room Action Buttons */
+.room-action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  justify-content: center;
+}
+
+.action-button {
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  border: none;
+  color: white;
+  flex: 1;
+  text-align: center;
+}
+
+.room-button {
+  background-color: var(--primary-color);
+}
+
+.location-button {
+  background-color: var(--secondary-color);
+}
+
+.contacts-button {
+  background-color: var(--accent-color);
+  color: var(--text-color);
+}
+
+.action-button:hover {
+  filter: brightness(110%);
+  transform: translateY(-2px);
+  box-shadow: var(--card-shadow);
+}
+
+.action-button:active {
+  transform: translateY(0);
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(3px);
+  padding: 0;
+  margin: 0;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 90%;
+  width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.3s ease;
+  margin: 0;
+}
+
+/* Loading and error states inside modal */
+.modal-content .loading-container,
+.modal-content .error-container {
+  margin: 0;
+}
+
+.modal-close-button {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: var(--transition);
+  color: var(--text-color);
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.modal-close-button:hover {
+  background-color: var(--light-gray);
+}
+
+/* Common modal styles for room, location, and contacts */
+.modal-room,
+.modal-location,
+.modal-contacts {
+  background-color: white;
+  width: 100%;
+  border-radius: 8px;
+  padding: 0;
+  margin: 0;
+  color: var(--text-color);
+}
+
+.modal-room h2,
+.modal-location h2,
+.modal-contacts h2 {
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--medium-gray);
+}
+
+.modal-info-grid {
+  display: grid;
+  gap: 1rem;
+  color: var(--text-color);
+}
+
+.modal-info-grid p {
+  margin: 0;
+  color: var(--text-color);
+}
+
+.modal-info-grid strong {
+  color: var(--secondary-color);
+}
+
+.modal-services, 
+.modal-event-types,
+.modal-rooms {
+  margin-top: 0.5rem;
+  color: var(--text-color);
+}
+
+.modal-services p, 
+.modal-event-types p,
+.modal-rooms p {
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+
+/* Service lists expandable container */
+.expandable-list-container {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+/* Service lists styling */
+.modal-services-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-right: 5px;
+  overflow-y: auto;
+  transition: all 0.3s ease;
+  position: relative;
+  color: var(--text-color);
+}
+
+/* Collapsed state */
+.modal-services-list.collapsed {
+  max-height: 100px;
+  overflow-y: hidden;
+}
+
+/* Expanded state */
+.modal-services-list.expanded {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Custom scrollbar for expanded lists */
+.modal-services-list.expanded::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-services-list.expanded::-webkit-scrollbar-track {
+  background: var(--light-gray);
+  border-radius: 10px;
+}
+
+.modal-services-list.expanded::-webkit-scrollbar-thumb {
+  background: var(--primary-light);
+  border-radius: 10px;
+}
+
+/* Gradient fade effect at the bottom of collapsed lists */
+.list-fade-gradient {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 25px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1));
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Show more/less button */
+.toggle-list-button {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 5px;
+  margin-top: 8px;
+  display: block;
+  text-decoration: underline;
+}
+
+.toggle-list-button:hover {
+  color: var(--secondary-color);
+}
+
+.modal-service-tag {
+  background-color: var(--light-gray);
+  padding: 0.3rem 0.6rem;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  color: var(--text-color);
+}
+
+.modal-rooms-list {
+  padding-left: 1.5rem;
+  margin: 0.5rem 0 0 0;
+  color: var(--text-color);
+}
+
+.modal-rooms-list li {
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+
+/* Contacts Modal Styles */
+.modal-contacts {
+  background-color: white;
+  width: 100%;
+  border-radius: 8px;
+  padding: 0;
+  margin: 0;
+}
+
+.contacts-list {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.contact-card {
+  background-color: var(--light-gray);
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: var(--card-shadow);
+  margin: 0;
+  color: var(--text-color);
+}
+
+.contact-card h3 {
+  color: var(--secondary-color);
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.contact-card p {
+  margin: 0.3rem 0;
+  font-size: 0.9rem;
+  color: var(--text-color);
+}
+
+.contact-card p strong {
+  color: var(--secondary-color);
+}
+
+.no-contacts {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-color);
+  background-color: var(--light-gray);
+  border-radius: 8px;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease forwards;
+}
+
+/* Pagination Styles */
+.pagination-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2rem 0;
+  gap: 1rem;
+}
+
+.pagination-button {
+  padding: 0.5rem 0.8rem;
+  margin: 0 0.25rem;
+  border: 1px solid var(--medium-gray);
+  background-color: white;
+  color: var(--text-color);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.pagination-button:hover {
+  background-color: var(--light-gray);
+  border-color: var(--primary-color);
+}
+
+.pagination-button.active {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.pagination-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  background-color: var(--light-gray);
+}
+
+.pagination-ellipsis {
+  margin: 0 0.25rem;
+}
+
+.pagination-info {
+  font-size: 0.9rem;
+  color: var(--text-color);
+}
+
+/* Room card expandable services */
+.room-card .expandable-list-container {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.room-card .room-services-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.room-card .room-services-list.collapsed {
+  max-height: 60px;
+  overflow-y: hidden;
+}
+
+.room-card .room-services-list.expanded {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.room-card .list-fade-gradient {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1));
+  pointer-events: none;
+  z-index: 5;
+}
+
+.room-card .toggle-list-button {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 3px;
+  margin-top: 3px;
+  display: block;
+  text-decoration: underline;
+}
+
+.room-card .toggle-list-button:hover {
+  color: var(--secondary-color);
+}
+
+/* Custom scrollbar styling for all lists and containers */
+.modal-services-list::-webkit-scrollbar,
+.room-services-list::-webkit-scrollbar,
+.modal-content::-webkit-scrollbar,
+.contacts-list::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.modal-services-list::-webkit-scrollbar-track,
+.room-services-list::-webkit-scrollbar-track,
+.modal-content::-webkit-scrollbar-track,
+.contacts-list::-webkit-scrollbar-track {
+  background: var(--light-gray);
+  border-radius: 10px;
+}
+
+.modal-services-list::-webkit-scrollbar-thumb,
+.room-services-list::-webkit-scrollbar-thumb,
+.modal-content::-webkit-scrollbar-thumb,
+.contacts-list::-webkit-scrollbar-thumb {
+  background: var(--primary-light);
+  border-radius: 10px;
+  border: 2px solid var(--light-gray);
+}
+
+.modal-services-list::-webkit-scrollbar-thumb:hover,
+.room-services-list::-webkit-scrollbar-thumb:hover,
+.modal-content::-webkit-scrollbar-thumb:hover,
+.contacts-list::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
+}
+
+/* Remove existing scrollbar rules */
+.modal-services-list.expanded::-webkit-scrollbar,
+.modal-services-list.expanded::-webkit-scrollbar-track,
+.modal-services-list.expanded::-webkit-scrollbar-thumb {
+  /* Styles now defined above globally */
+}

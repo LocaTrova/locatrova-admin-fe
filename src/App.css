@@ -1,0 +1,20 @@
+/* Reset default #root styling */
+#root {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Auth loading screen */
+.auth-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: var(--color-gray-50);
+}
+
+/* Remove unused styles */
