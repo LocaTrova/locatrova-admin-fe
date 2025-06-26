@@ -1,21 +1,9 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { filteredLocations, saveChanges, deleteLocation } from '../../api/locations/api';
+import { Location } from '../../api/common/types';
 import './locations.css';
 import LocationsError from './error';
 import { useNavigate } from 'react-router-dom';
-
-interface Location {
-  _id: string;
-  name: string;
-  ownerId: string;
-  ownerName: string;
-  ownerSurname: string;
-  city: string;
-  stripeId: string;
-  special: boolean;
-  fee: number;
-  active: boolean;
-}
 
 interface SearchParams {
   name?: string;
@@ -103,10 +91,10 @@ const LocationsPage: React.FC = () => {
     try {
       const locationsToSave = paramsLocations
         .filter(l => changedLocations.has(l._id))
-        .map(({ ownerId, ownerName, ownerSurname, ...rest }) => {
+        .map(({ ownerId, ownerName, ownerSurname, _id, ...rest }) => {
           // Remove owner fields as they shouldn't be updated
           void ownerId; void ownerName; void ownerSurname;
-          return rest;
+          return { ...rest, id: _id };
         });
 
       await saveChanges(locationsToSave);

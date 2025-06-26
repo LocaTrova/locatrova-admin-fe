@@ -22,7 +22,7 @@ interface ReservationData {
   amount: number;
   payment: 'SUCCESS' | 'REFUNDED';
   stripeId: string;
-  createdAt: string;
+  createdAt?: string;
   [key: string]: unknown;
 }
 
@@ -47,8 +47,8 @@ const ReservationDetail: React.FC = () => {
           navigate('/reservations');
           return;
         }
-        setInitialData(reservationDetails);
-        setFormData(reservationDetails);
+        setInitialData(reservationDetails as ReservationData);
+        setFormData(reservationDetails as ReservationData);
       } catch (error) {
         console.error('Error fetching reservation details:', error);
         navigate('/reservations');
@@ -91,7 +91,7 @@ const ReservationDetail: React.FC = () => {
 
     setSaving(true);
     try {
-      await updateReservation({ reservationId, ...formData });
+      await updateReservation({ reservationId: reservationId!, ...formData });
       setInitialData(formData);
       
       // Show success feedback
@@ -214,7 +214,7 @@ const ReservationDetail: React.FC = () => {
                 <label>Data Creazione</label>
                 <input 
                   type="text" 
-                  value={formatDate(formData.createdAt)} 
+                  value={formatDate(formData.createdAt || '')} 
                   disabled 
                   className="input-disabled"
                 />

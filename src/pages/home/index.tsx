@@ -2,6 +2,13 @@ import './home.css';
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
+interface ActivityItem {
+  id: number;
+  type: string;
+  message: string;
+  time: string;
+}
+
 const HomePage: React.FC = () => {
   const [stats, setStats] = useState({
     users: 0,
@@ -10,7 +17,7 @@ const HomePage: React.FC = () => {
     revenue: 0
   });
 
-  const [recentActivity, setRecentActivity] = useState<unknown[]>([]);
+  const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
 
   useEffect(() => {
     // Simulated data - replace with actual API calls

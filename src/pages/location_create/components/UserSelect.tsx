@@ -28,7 +28,7 @@ export const UserSelect: FC<UserSelectProps> = ({ selectedUserId, onUserSelect }
       setLoading(true);
       try {
         const result = await getUsersWithFilters({ search: searchTerm });
-        setUsers(Array.isArray(result?.data) ? result.data : []);
+        setUsers(Array.isArray(result?.users) ? result.users : []);
       } catch (error) {
         console.error('Failed to fetch users:', error);
         setUsers([]);

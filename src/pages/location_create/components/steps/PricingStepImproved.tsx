@@ -92,31 +92,34 @@ const PricingStep: FC<PricingStepProps> = ({
         return null;
       
       case 'duration':
-        if (!value || value <= 0) return 'La durata deve essere maggiore di 0';
-        if (value > 24) return 'La durata massima è 24 ore';
-        if (value < 0.5) return 'La durata minima è 30 minuti (0.5 ore)';
+        const numValue = value as number;
+        if (!numValue || numValue <= 0) return 'La durata deve essere maggiore di 0';
+        if (numValue > 24) return 'La durata massima è 24 ore';
+        if (numValue < 0.5) return 'La durata minima è 30 minuti (0.5 ore)';
         // Business rule: warn about odd durations
-        if (value % 0.5 !== 0) return 'La durata deve essere un multiplo di 30 minuti';
+        if (numValue % 0.5 !== 0) return 'La durata deve essere un multiplo di 30 minuti';
         return null;
       
       case 'fee':
-        if (!value || value <= 0) return 'La commissione è obbligatoria';
-        if (value < COMMISSION_RULES.min) return `La commissione minima è ${COMMISSION_RULES.min}%`;
-        if (value > COMMISSION_RULES.max) return `La commissione massima è ${COMMISSION_RULES.max}%`;
+        const feeValue = value as number;
+        if (!feeValue || feeValue <= 0) return 'La commissione è obbligatoria';
+        if (feeValue < COMMISSION_RULES.min) return `La commissione minima è ${COMMISSION_RULES.min}%`;
+        if (feeValue > COMMISSION_RULES.max) return `La commissione massima è ${COMMISSION_RULES.max}%`;
         // Business rule: warn about non-standard rates
-        if (value !== COMMISSION_RULES.standard && value !== COMMISSION_RULES.special && value !== COMMISSION_RULES.premium) {
-          return `Commissione personalizzata: ${value}%. Standard: ${COMMISSION_RULES.standard}%`;
+        if (feeValue !== COMMISSION_RULES.standard && feeValue !== COMMISSION_RULES.special && feeValue !== COMMISSION_RULES.premium) {
+          return `Commissione personalizzata: ${feeValue}%. Standard: ${COMMISSION_RULES.standard}%`;
         }
         return null;
       
       case 'stripeId':
-        if (!data.special && (!value || !value.trim())) {
+        const stripeValue = value as string;
+        if (!data.special && (!stripeValue || !stripeValue.trim())) {
           return 'Stripe Account ID è obbligatorio per location non speciali';
         }
-        if (value && !value.startsWith('acct_')) {
+        if (stripeValue && !stripeValue.startsWith('acct_')) {
           return 'L\'ID Stripe deve iniziare con "acct_"';
         }
-        if (value && value.length < 21) {
+        if (stripeValue && stripeValue.length < 21) {
           return 'L\'ID Stripe sembra troppo corto';
         }
         return null;
@@ -135,13 +138,23 @@ const PricingStep: FC<PricingStepProps> = ({
 
   // Update field errors when data changes
   useEffect(() => {
-    const fields = ['durationType', 'duration', 'fee', 'stripeId', 'refundPolicyId'];
     const newErrors: Record<string, string> = {};
     
-    fields.forEach(field => {
-      const error = validateField(field, (data as Record<string, unknown>)[field]);
-      if (error) newErrors[field] = error;
-    });
+    // Validate individual fields
+    const durationTypeError = validateField('durationType', data.durationType);
+    if (durationTypeError) newErrors.durationType = durationTypeError;
+    
+    const durationError = validateField('duration', data.duration);
+    if (durationError) newErrors.duration = durationError;
+    
+    const feeError = validateField('fee', data.fee);
+    if (feeError) newErrors.fee = feeError;
+    
+    const stripeIdError = validateField('stripeId', data.stripeId);
+    if (stripeIdError) newErrors.stripeId = stripeIdError;
+    
+    const refundPolicyError = validateField('refundPolicyId', data.refundPolicyId);
+    if (refundPolicyError) newErrors.refundPolicyId = refundPolicyError;
     
     setFieldErrors(newErrors);
   }, [data, validateField]);
@@ -225,14 +238,22 @@ const PricingStep: FC<PricingStepProps> = ({
     
     // Also check our enhanced field validations
     const enhancedErrors: Record<string, string> = {};
-    const fields = ['durationType', 'duration', 'fee', 'stripeId', 'refundPolicyId'];
     
-    fields.forEach(field => {
-      const error = validateField(field, (data as Record<string, unknown>)[field]);
-      if (error && !error.includes('personalizzata')) { // Don't block on custom rates
-        enhancedErrors[field] = error;
-      }
-    });
+    // Validate individual fields
+    const durationTypeError = validateField('durationType', data.durationType);
+    if (durationTypeError && !durationTypeError.includes('personalizzata')) enhancedErrors.durationType = durationTypeError;
+    
+    const durationError = validateField('duration', data.duration);
+    if (durationError && !durationError.includes('personalizzata')) enhancedErrors.duration = durationError;
+    
+    const feeError = validateField('fee', data.fee);
+    if (feeError && !feeError.includes('personalizzata')) enhancedErrors.fee = feeError;
+    
+    const stripeIdError = validateField('stripeId', data.stripeId);
+    if (stripeIdError && !stripeIdError.includes('personalizzata')) enhancedErrors.stripeId = stripeIdError;
+    
+    const refundPolicyError = validateField('refundPolicyId', data.refundPolicyId);
+    if (refundPolicyError && !refundPolicyError.includes('personalizzata')) enhancedErrors.refundPolicyId = refundPolicyError;
 
     const allErrors = { ...validationResult.errors, ...enhancedErrors };
     
@@ -259,11 +280,14 @@ const PricingStep: FC<PricingStepProps> = ({
     
     switch (field) {
       case 'duration':
-        return value > 0 ? 'success' : '';
+        const numValue = value as number;
+        return numValue > 0 ? 'success' : '';
       case 'fee':
-        return value >= COMMISSION_RULES.min && value <= COMMISSION_RULES.max ? 'success' : '';
+        const feeValue = value as number;
+        return feeValue >= COMMISSION_RULES.min && feeValue <= COMMISSION_RULES.max ? 'success' : '';
       case 'stripeId':
-        return value && value.startsWith('acct_') && value.length >= 21 ? 'success' : '';
+        const strValue = value as string;
+        return strValue && strValue.startsWith('acct_') && strValue.length >= 21 ? 'success' : '';
       default:
         return value ? 'success' : '';
     }
@@ -271,7 +295,7 @@ const PricingStep: FC<PricingStepProps> = ({
 
   const selectedPolicy = REFUND_POLICIES.find(p => p.id === data.refundPolicyId);
   const isFormValid = data.durationType && 
-                     data.duration > 0 && 
+                     data.duration && data.duration > 0 && 
                      data.fee >= COMMISSION_RULES.min && 
                      data.fee <= COMMISSION_RULES.max &&
                      (data.special || (data.stripeId && data.stripeId.startsWith('acct_'))) &&
@@ -360,7 +384,7 @@ const PricingStep: FC<PricingStepProps> = ({
             aria-invalid={!!(fieldErrors.duration || errors.duration)}
           />
           
-          {data.duration > 0 && (
+          {data.duration && data.duration > 0 && (
             <div style={{
               position: 'absolute',
               right: '12px',
@@ -382,7 +406,7 @@ const PricingStep: FC<PricingStepProps> = ({
           </div>
         )}
         
-        {!fieldErrors.duration && !errors.duration && data.duration > 0 && (
+        {!fieldErrors.duration && !errors.duration && data.duration && data.duration > 0 && (
           <div className="form-success">
             <span>✓</span>
             Durata valida: {data.duration} {data.duration === 1 ? 'ora' : 'ore'}

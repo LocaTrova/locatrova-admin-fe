@@ -62,6 +62,22 @@ const OwnerSelectionStep: FC<OwnerSelectionStepProps> = ({
     };
   }, []);
 
+  // Load user by ID (when component mounts with existing ownerId)
+  const loadUserById = useCallback(async (userId: string) => {
+    try {
+      // This is a simplified approach - in production you might have a getUserById API
+      const result = await getUsersWithFilters({ userId });
+      const user = result.users?.[0];
+      if (user) {
+        setSelectedUser(user);
+      }
+    } catch (error) {
+      console.error('Failed to load user by ID:', error);
+      // Clear invalid ownerId
+      updateData({ ownerId: '' });
+    }
+  }, [updateData]);
+
   // Memoize whether we should load user by ID to prevent excessive calls
   const shouldLoadUserById = useMemo(() => {
     return data.ownerId && !selectedUser && !searchState.users.find(u => u._id === data.ownerId);
@@ -87,22 +103,6 @@ const OwnerSelectionStep: FC<OwnerSelectionStepProps> = ({
   const sanitizeInput = (input: string): string => {
     return input.trim().replace(/[<>]/g, '');
   };
-
-  // Load user by ID (when component mounts with existing ownerId)
-  const loadUserById = useCallback(async (userId: string) => {
-    try {
-      // This is a simplified approach - in production you might have a getUserById API
-      const result = await getUsersWithFilters({ userId });
-      const user = result.users?.[0];
-      if (user) {
-        setSelectedUser(user);
-      }
-    } catch (error) {
-      console.error('Failed to load user by ID:', error);
-      // Clear invalid ownerId
-      updateData({ ownerId: '' });
-    }
-  }, [updateData]);
 
   // Enhanced user search with proper error handling and cleanup
   const searchUsers = useCallback(async (term: string) => {
@@ -180,7 +180,8 @@ const OwnerSelectionStep: FC<OwnerSelectionStepProps> = ({
   const validateField = useCallback((field: string, value: unknown): string | null => {
     switch (field) {
       case 'ownerId':
-        if (!data.special && (!value || !value.trim())) {
+        const ownerValue = value as string;
+        if (!data.special && (!ownerValue || !ownerValue.trim())) {
           return 'Seleziona un proprietario o marca la location come speciale';
         }
         return null;

@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { getLoggedUser, logout } from '../api/auth/api';
+import { User } from '../api/common/types';
 import './NavigationLayout.css';
-
-interface User {
-  username: string;
-  email?: string;
-  id?: string;
-}
 
 const NavigationLayout: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -103,9 +98,9 @@ const NavigationLayout: React.FC = () => {
                   aria-expanded={isUserMenuOpen}
                 >
                   <div className="user-avatar">
-                    {user.username.charAt(0).toUpperCase()}
+                    {(user.username || user.email || 'U').charAt(0).toUpperCase()}
                   </div>
-                  <span className="user-name">{user.username}</span>
+                  <span className="user-name">{user.username || user.email}</span>
                   <svg
                     className={`dropdown-arrow ${isUserMenuOpen ? 'open' : ''}`}
                     width="12"

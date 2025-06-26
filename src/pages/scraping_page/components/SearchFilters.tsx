@@ -54,10 +54,10 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
       try {
         const types = await getEventTypes();
         if (Array.isArray(types)) {
-          // Ensure we only set properly typed objects
-          const typedEventTypes: EventType[] = types.map((type: Record<string, unknown>) => ({
-            _id: type._id || type.id || '',
-            name: type.name || ''
+          // Convert string array to EventType objects
+          const typedEventTypes: EventType[] = types.map((typeName: string, index: number) => ({
+            _id: `event-type-${index}`,
+            name: typeName
           }));
           setEventTypes(typedEventTypes);
         }
@@ -71,10 +71,10 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
       try {
         const types = await getVenueTypes();
         if (Array.isArray(types)) {
-          // Ensure we only set properly typed objects
-          const typedVenueTypes: VenueType[] = types.map((type: Record<string, unknown>) => ({
-            _id: type._id || type.id || '',
-            name: type.name || ''
+          // Convert string array to VenueType objects  
+          const typedVenueTypes: VenueType[] = types.map((typeName: string, index: number) => ({
+            _id: `venue-type-${index}`,
+            name: typeName
           }));
           setVenueTypes(typedVenueTypes);
         }

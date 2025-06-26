@@ -17,9 +17,9 @@ const VenueTypeFilter: React.FC<VenueTypeFilterProps> = ({ selectedVenueType, on
       try {
         const types = await getVenueTypes();
         if (Array.isArray(types)) {
-          const typedVenueTypes: VenueType[] = types.map((type: Record<string, unknown>) => ({
-            _id: type._id || type.id || '',
-            name: type.name || ''
+          const typedVenueTypes: VenueType[] = types.map((typeName: string, index: number) => ({
+            _id: `venue-type-${index}`,
+            name: typeName
           }));
           setVenueTypes(typedVenueTypes);
         }

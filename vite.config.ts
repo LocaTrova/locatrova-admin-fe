@@ -3,12 +3,13 @@ import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: '/',
   plugins: [react()],
-  server: {
-    host: true, // Needed for Docker/Render
-    port: 5173, // Default port
-    strictPort: true,
-  },
+  // server: {
+  //   host: true, // Needed for Docker/Render
+  //   port: 5173, // Default port
+  //   strictPort: true,
+  // },
   build: {
     outDir: 'dist',
     sourcemap: true,
@@ -17,8 +18,6 @@ export default defineConfig({
   },
   // Environment variables prefix
   envPrefix: 'VITE_',
-  // Base URL for production
-  base: './',
   // Optimize dependencies
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom'],

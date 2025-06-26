@@ -5,14 +5,10 @@ import { getAddressSuggestions } from '../../../api/utils/api';
 
 // Update the type to match the backend response
 type AddressSuggestion = {
-  place_name: string;  // Full address
-  geometry: {
-    coordinates: [number, number];  // [longitude, latitude]
-  };
-  context: Array<{
-    id: string;
-    text: string;
-  }>;
+  formattedAddress: string;
+  lat: number;
+  lng: number;
+  placeId?: string;
 };
 
 const BasicInfo: FC = () => {
@@ -38,8 +34,8 @@ const BasicInfo: FC = () => {
     if (value.length > 3) {
       try {
         const res = await getAddressSuggestions(value);
-        if (res?.features) {
-          setAddressSuggestions(res.features);
+        if (res) {
+          setAddressSuggestions(res);
         }
       } catch (error) {
         console.error(error);
@@ -50,29 +46,15 @@ const BasicInfo: FC = () => {
   };
 
   const handleSelectAddress = (feature: AddressSuggestion) => {
-    let city = "";
-    let cap = "";
-    let region = "";
-
-    if (feature.context) {
-      feature.context.forEach((c) => {
-        if (c.id.startsWith("place.")) {
-          city = c.text;
-        } else if (c.id.startsWith("postcode.")) {
-          cap = c.text;
-        } else if (c.id.startsWith("region.")) {
-          region = c.text;
-        }
-      });
-    }
+    // Extract city from formatted address (simple approach - take the part after the first comma)
+    const addressParts = feature.formattedAddress.split(',');
+    const city = addressParts.length > 1 ? addressParts[1].trim() : '';
 
     setFormData(prev => ({
       ...prev,
-      address: feature.place_name,
+      address: feature.formattedAddress,
       city,
-      cap,
-      region,
-      coordinates: feature.geometry.coordinates,
+      coordinates: [feature.lng, feature.lat],
       addressSelected: true
     }));
     setAddressSuggestions([]);
@@ -118,7 +100,7 @@ const BasicInfo: FC = () => {
                 onClick={() => handleSelectAddress(suggestion)}
                 className={styles.suggestionItem}
               >
-                {suggestion.place_name}
+                {suggestion.formattedAddress}
               </li>
             ))}
           </ul>

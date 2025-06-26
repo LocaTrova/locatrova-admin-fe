@@ -8,11 +8,12 @@ interface UserData {
   name: string;
   surname: string;
   email: string;
-  phone: string;
+  phone?: string;
   active: boolean;
-  verified: boolean;
-  createdAt: string;
+  verified?: boolean;
+  createdAt?: string;
   lastLogin?: string;
+  username?: string;
   [key: string]: unknown;
 }
 
@@ -38,8 +39,9 @@ const UserDetail: React.FC = () => {
           return;
         }
         
-        setInitialData(userDetails);
-        setFormData(userDetails);
+        const userData: UserData = { ...userDetails };
+        setInitialData(userData);
+        setFormData(userData);
       } catch (error) {
         console.error('Error fetching user details:', error);
         navigate('/users');
@@ -72,7 +74,7 @@ const UserDetail: React.FC = () => {
 
     setSaving(true);
     try {
-      await updateUser({ ...formData, userId });
+      await updateUser({ ...formData, id: userId! });
       setInitialData(formData);
       
       // Show success feedback
@@ -315,7 +317,7 @@ const UserDetail: React.FC = () => {
 
               <div className="info-item">
                 <span className="info-label">Data Creazione</span>
-                <span className="info-value">{formatDate(formData.createdAt)}</span>
+                <span className="info-value">{formData.createdAt ? formatDate(formData.createdAt) : 'N/A'}</span>
               </div>
 
               {formData.lastLogin && (

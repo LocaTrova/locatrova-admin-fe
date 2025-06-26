@@ -16,11 +16,11 @@ const EventTypeFilter: React.FC<EventTypeFilterProps> = ({ selectedEventType, on
     const fetchEventTypes = async () => {
       try {
         const types = await getEventTypes();
-        // Make sure we're getting an array of EventType objects
+        // Convert string array to EventType objects
         if (Array.isArray(types)) {
-          const typedEventTypes: EventType[] = types.map((type: Record<string, unknown>) => ({
-            _id: type._id || type.id || '',
-            name: type.name || ''
+          const typedEventTypes: EventType[] = types.map((typeName: string, index: number) => ({
+            _id: `event-type-${index}`,
+            name: typeName
           }));
           setEventTypes(typedEventTypes);
         }

@@ -5,8 +5,14 @@ interface UnavailableDatesProps {
   roomId: string;
 }
 
+interface UnavailableDate {
+  date: string;
+  start: string;
+  end: string;
+}
+
 export const UnavailableDates: FC<UnavailableDatesProps> = ({ roomId }) => {
-  const [unavailableDates, setUnavailableDates] = useState<Record<string, unknown>[]>(
+  const [unavailableDates, setUnavailableDates] = useState<UnavailableDate[]>(
     []
   );
 

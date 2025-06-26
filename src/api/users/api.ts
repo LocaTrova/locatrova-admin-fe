@@ -1,4 +1,3 @@
-import { UserCreateRequest } from './types';
 import { 
   User, 
   UsersResponse, 

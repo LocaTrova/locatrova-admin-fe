@@ -1,8 +1,37 @@
-export const processRooms = (data: Record<string, unknown>[]): unknown[] => {
-  const rooms: Record<string, Record<string, unknown>> = {};
+interface FormDataEntry {
+  key: string;
+  value: unknown;
+}
+
+interface UnavailableDate {
+  date: string;
+  start: string;
+  end: string;
+}
+
+interface RoomData {
+  roomId?: number;
+  name?: string;
+  maxPeople?: number;
+  pricePerHour?: number;
+  squareMeters?: number;
+  daily?: {
+    available?: boolean;
+    price?: number;
+    start?: string;
+    end?: string;
+    days?: number[];
+  };
+  images?: unknown[];
+  unavailableDates?: UnavailableDate[];
+  [key: string]: unknown;
+}
+
+export const processRooms = (data: FormDataEntry[]): RoomData[] => {
+  const rooms: Record<string, RoomData> = {};
   
   data.forEach(({key, value}) => {
-    const match = key.match(/^rooms\[(\d+)\]\.(.+)$/);
+    const match = (key as string).match(/^rooms\[(\d+)\]\.(.+)$/);
     if (!match) return;
     
     const [, index, field] = match;
@@ -14,13 +43,13 @@ export const processRooms = (data: Record<string, unknown>[]): unknown[] => {
       const dailyField = field.replace('daily.', '');
       
       if (dailyField === 'available') {
-        rooms[index].daily[dailyField] = value === 'on' || value === 'true';
+        rooms[index].daily![dailyField] = value === 'on' || value === 'true';
       } else if (dailyField === 'price') {
-        rooms[index].daily[dailyField] = Number(value);
+        rooms[index].daily![dailyField] = Number(value);
       } else if (dailyField === 'days') {
-        rooms[index].daily!.days = value.split(',').map((v: string) => Number(v.trim()));
+        rooms[index].daily!.days = (value as string).split(',').map((v: string) => Number(v.trim()));
       } else {
-        rooms[index].daily[dailyField] = value;
+        (rooms[index].daily as any)[dailyField] = value as string;
       }
     }
 
@@ -43,8 +72,9 @@ export const processRooms = (data: Record<string, unknown>[]): unknown[] => {
       if (udMatch) {
         const [, unavailableIndex, dateField] = udMatch;
         rooms[index].unavailableDates = rooms[index].unavailableDates || [];
-        rooms[index].unavailableDates[unavailableIndex] = rooms[index].unavailableDates[unavailableIndex] || { date: '', start: '', end: '' };
-        rooms[index].unavailableDates[unavailableIndex][dateField] = value;
+        const unavailableIndexNum = parseInt(unavailableIndex);
+        rooms[index].unavailableDates![unavailableIndexNum] = rooms[index].unavailableDates![unavailableIndexNum] || { date: '', start: '', end: '' };
+        (rooms[index].unavailableDates![unavailableIndexNum] as any)[dateField] = value as string;
 
         // Now the field has been put into the array of objects
         // like this:
@@ -55,14 +85,16 @@ export const processRooms = (data: Record<string, unknown>[]): unknown[] => {
 
       }
     } else {
-      rooms[index][field] = field.match(/^(maxPeople|pricePerHour|squareMeters)$/) 
-        ? Number(value) 
-        : value;
+      if (field.match(/^(maxPeople|pricePerHour|squareMeters)$/)) {
+        (rooms[index] as any)[field] = Number(value);
+      } else {
+        (rooms[index] as any)[field] = value;
+      }
     }
   });
   
   // Ensure daily is in the following format if not present
-  Object.values(rooms).forEach((room: Record<string, unknown>) => {
+  Object.values(rooms).forEach((room: RoomData) => {
     if (!room.daily || Object.keys(room.daily).length === 0) {
       room.daily = {
         available: false,
@@ -73,26 +105,36 @@ export const processRooms = (data: Record<string, unknown>[]): unknown[] => {
   return Object.values(rooms);
 };
 
-export const processWeekAvailability = (data: Record<string, unknown>[]) => {
-  const availabilityMap: Record<string, unknown> = {};
+interface TimeSlot {
+  start: string;
+  end: string;
+}
+
+interface DayAvailability {
+  slots: TimeSlot[];
+}
+
+export const processWeekAvailability = (data: FormDataEntry[]): TimeSlot[][] => {
+  const availabilityMap: Record<string, DayAvailability> = {};
 
   console.log('data', data)
 
   data.forEach(({ key, value }) => {
-    const match = key.match(/^availability\[(\d+)\]\.slots\[(\d+)\]\.(.*)$/);
+    const match = (key as string).match(/^availability\[(\d+)\]\.slots\[(\d+)\]\.(.*)$/);
     if (!match) return;
 
     const [, dayIndex, slotIndex, field] = match;
     
     availabilityMap[dayIndex] = availabilityMap[dayIndex] || { slots: [] };
-    availabilityMap[dayIndex].slots[slotIndex] = availabilityMap[dayIndex].slots[slotIndex] || {};
-    availabilityMap[dayIndex].slots[slotIndex][field] = value;
+    const slotIndexNum = parseInt(slotIndex);
+    availabilityMap[dayIndex].slots[slotIndexNum] = availabilityMap[dayIndex].slots[slotIndexNum] || { start: '', end: '' };
+    (availabilityMap[dayIndex].slots[slotIndexNum] as any)[field] = value as string;
   });
 
   return Object.entries(availabilityMap).map(([, { slots }]) => {
     // If all slots are empty (i.e. both start and end are empty strings),
     // return an empty array for that day.
-    if (slots.every((slot: Record<string, string>) => slot.start === 'EMPTY' && slot.end === 'EMPTY')) {
+    if (slots.every((slot: TimeSlot) => slot.start === 'EMPTY' && slot.end === 'EMPTY')) {
       return [];
     }
     return slots;

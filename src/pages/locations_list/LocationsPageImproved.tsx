@@ -6,15 +6,15 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 interface Location {
   _id: string;
   name: string;
-  ownerId: string;
-  ownerName: string;
-  ownerSurname: string;
+  ownerId?: string;
+  ownerName?: string;
+  ownerSurname?: string;
   city: string;
-  stripeId: string;
+  stripeId?: string;
   special: boolean;
   fee: number;
   active: boolean;
-  verified: boolean;
+  verified?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -103,21 +103,6 @@ const LocationsPage: React.FC = () => {
     setSearchParams(newSearchParams, { replace: true });
   }, [params, setSearchParams]);
 
-  // Enhanced debounced search
-  const debouncedFetchLocations = useCallback(() => {
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
-    }
-    
-    searchTimeoutRef.current = setTimeout(() => {
-      fetchLocations();
-    }, isInitialLoad ? 0 : 500);
-  }, [isInitialLoad, fetchLocations]);
-
-  useEffect(() => {
-    debouncedFetchLocations();
-  }, [debouncedFetchLocations]);
-
   const fetchLocations = useCallback(async () => {
     // Cancel previous request
     if (abortControllerRef.current) {
@@ -166,6 +151,21 @@ const LocationsPage: React.FC = () => {
       }
     }
   }, [params]);
+
+  // Enhanced debounced search
+  const debouncedFetchLocations = useCallback(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    
+    searchTimeoutRef.current = setTimeout(() => {
+      fetchLocations();
+    }, isInitialLoad ? 0 : 500);
+  }, [isInitialLoad, fetchLocations]);
+
+  useEffect(() => {
+    debouncedFetchLocations();
+  }, [debouncedFetchLocations]);
 
   // Get display locations (original + modifications)
   const displayLocations = useMemo(() => {
@@ -245,6 +245,28 @@ const LocationsPage: React.FC = () => {
     });
   }, [locations]);
 
+  // Enhanced notification system
+  const showNotification = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    const existingToasts = document.querySelectorAll('.toast');
+    existingToasts.forEach(toast => toast.remove());
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+      <div class="toast-content">
+        <span class="toast-icon">${type === 'success' ? '✓' : type === 'error' ? '⚠️' : 'ℹ️'}</span>
+        <span class="toast-message">${message}</span>
+      </div>
+    `;
+    
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.remove();
+      }
+    }, 4000);
+  }, []);
+
   const handleSaveChanges = useCallback(async () => {
     if (modifiedLocations.size === 0) return;
 
@@ -260,7 +282,7 @@ const LocationsPage: React.FC = () => {
         return locationData;
       });
 
-      await saveChanges(locationsToSave);
+      await saveChanges(locationsToSave.map(loc => ({ ...loc, id: loc._id })));
       
       // Success feedback
       setModifiedLocations(new Map());
@@ -380,27 +402,7 @@ const LocationsPage: React.FC = () => {
     setLocationChanges(new Map());
   }, []);
 
-  // Enhanced notification system (same as users page)
-  const showNotification = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
-    const existingToasts = document.querySelectorAll('.toast');
-    existingToasts.forEach(toast => toast.remove());
-
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.innerHTML = `
-      <div class="toast-content">
-        <span class="toast-icon">${type === 'success' ? '✓' : type === 'error' ? '⚠️' : 'ℹ️'}</span>
-        <span class="toast-message">${message}</span>
-      </div>
-    `;
-    
-    document.body.appendChild(toast);
-    setTimeout(() => {
-      if (toast.parentNode) {
-        toast.remove();
-      }
-    }, 4000);
-  }, []);
+  // showNotification function moved above
 
   // Calculations
   const totalPages = Math.ceil(totalLocations / (params.limit || 10));

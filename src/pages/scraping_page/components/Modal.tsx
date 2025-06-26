@@ -54,9 +54,16 @@ const Modal: React.FC<ModalProps> = ({ isOpen, modalType, roomId, onClose }) => 
           const contactsData = await getContactsByRoomId(roomId);
           console.log('Contacts data:', contactsData);
           
-          // Check the structure of the contacts data
+          // Check the structure of the contacts data and convert to Contact[]
           if (Array.isArray(contactsData) && contactsData.length > 0) {
-            setContacts(contactsData);
+            const typedContacts: Contact[] = contactsData.map((contact: any) => ({
+              _id: contact._id || `contact-${Math.random()}`,
+              name: contact.name || 'Unknown',
+              role: contact.role || 'Unknown',
+              tel: contact.tel || contact.phone || '',
+              email: contact.email || ''
+            }));
+            setContacts(typedContacts);
           } else {
             console.warn('No contacts data found or invalid format:', contactsData);
             setContacts([]);

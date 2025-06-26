@@ -1,18 +1,8 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { getUsersWithFilters, saveChanges, deleteUser } from '../../api/users/api';
+import { User } from '../../api/common/types';
 import './users.css';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-
-interface User {
-  _id: string;
-  name: string;
-  surname: string;
-  email: string;
-  phone: string;
-  active: boolean;
-  createdAt?: string;
-  lastLogin?: string;
-}
 
 interface SearchParams {
   username?: string;

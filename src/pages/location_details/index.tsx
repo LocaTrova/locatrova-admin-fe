@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { getLocationDetails, updateLocation } from '../../api/locations/api';
+import { Location } from '../../api/common/types';
 import './location_details.css';
+
+interface LocationData extends Location {
+  [key: string]: unknown;
+}
 
 const LocationDetail: React.FC = () => {
   const { locationId } = useParams<{ locationId: string }>();
-  const [initialData, setInitialData] = useState<Record<string, unknown>>({});
-  const [formData, setFormData] = useState<Record<string, unknown>>({});
+  const [initialData, setInitialData] = useState<LocationData | null>(null);
+  const [formData, setFormData] = useState<LocationData | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
   const navigate = useNavigate();
 
@@ -25,8 +30,8 @@ const LocationDetail: React.FC = () => {
           return;
         }
 
-        setInitialData(locationDetails);
-        setFormData(locationDetails);
+        setInitialData(locationDetails as LocationData);
+        setFormData(locationDetails as LocationData);
       } catch (error) {
         console.error('Error fetching location details:', error);
         navigate('/locations');
@@ -42,7 +47,8 @@ const LocationDetail: React.FC = () => {
 
   const handleNestedChange = (path: string[], value: unknown) => {
     setFormData((prev) => {
-      const newData = { ...prev };
+      if (!prev) return null;
+      const newData = { ...prev } as any;
       let current = newData;
       for (let i = 0; i < path.length - 1; i++) {
         current = current[path[i]];
@@ -55,6 +61,8 @@ const LocationDetail: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    if (!formData || !initialData) return;
+
     const modifiedData = Object.keys(formData).reduce((acc, key) => {
       if (formData[key] !== initialData[key]) {
         acc[key] = formData[key];
@@ -62,11 +70,11 @@ const LocationDetail: React.FC = () => {
       return acc;
     }, {} as Record<string, unknown>);
 
-    const formDataObject = { locationId, ...modifiedData };
+    // Remove locationId from here as it's added below
 
     try {
-      const { successMessage } = await updateLocation(formDataObject);
-      setSuccess(!!successMessage);
+      const response = await updateLocation({ id: locationId!, ...modifiedData });
+      setSuccess(!!response);
     } catch (error) {
       console.error('Error updating location: ', error);
       setSuccess(false);
@@ -114,7 +122,7 @@ const LocationDetail: React.FC = () => {
         <div key={key} className="form-group">
           <label>{key}:</label>
           <div className="nested-group">
-            {Object.entries(value).map(([subKey, subValue]) =>
+            {Object.entries(value as Record<string, unknown>).map(([subKey, subValue]) =>
               renderField(subKey, subValue, fullPath)
             )}
           </div>
@@ -150,7 +158,7 @@ const LocationDetail: React.FC = () => {
           <label htmlFor={key}>{key}:</label>
           <textarea
             {...commonProps}
-            value={value}
+            value={String(value || '')}
             onChange={(e) => handleNestedChange(fullPath, e.target.value)}
           />
         </div>
@@ -162,7 +170,7 @@ const LocationDetail: React.FC = () => {
           <input
             {...commonProps}
             type="text"
-            value={value}
+            value={String(value || '')}
             onChange={(e) => handleNestedChange(fullPath, e.target.value)}
           />
         </div>
@@ -170,7 +178,7 @@ const LocationDetail: React.FC = () => {
     }
   };
 
-  if (!Object.keys(formData).length) {
+  if (!formData || !Object.keys(formData).length) {
     return <div className="loading">Loading...</div>;
   }
 

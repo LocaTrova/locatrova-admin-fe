@@ -199,41 +199,39 @@ const LocationCreateWizard: FC = () => {
     const stepErrors: Record<string, string> = {};
     
     step.required.forEach(field => {
-      const value = (formData as Record<string, unknown>)[field];
-      
       switch (field) {
         case 'name':
-          if (!value?.trim()) stepErrors[field] = 'Nome richiesto';
+          if (!formData.name?.trim()) stepErrors[field] = 'Nome richiesto';
           break;
         case 'address':
-          if (!value?.trim()) stepErrors[field] = 'Indirizzo richiesto';
+          if (!formData.address?.trim()) stepErrors[field] = 'Indirizzo richiesto';
           break;
         case 'city':
-          if (!value?.trim()) stepErrors[field] = 'Città richiesta';
+          if (!formData.city?.trim()) stepErrors[field] = 'Città richiesta';
           break;
         case 'ownerId':
-          if (!formData.special && !value?.trim()) stepErrors[field] = 'Proprietario richiesto';
+          if (!formData.special && !formData.ownerId?.trim()) stepErrors[field] = 'Proprietario richiesto';
           break;
         case 'type':
-          if (!value || value.length === 0) stepErrors[field] = 'Almeno una tipologia richiesta';
+          if (!formData.type || formData.type.length === 0) stepErrors[field] = 'Almeno una tipologia richiesta';
           break;
         case 'durationType':
-          if (!value) stepErrors[field] = 'Tipo durata richiesto';
+          if (!formData.durationType) stepErrors[field] = 'Tipo durata richiesto';
           break;
         case 'duration':
-          if (!value || value <= 0) stepErrors[field] = 'Durata richiesta';
+          if (!formData.duration || formData.duration <= 0) stepErrors[field] = 'Durata richiesta';
           break;
         case 'fee':
-          if (!value || value < 10 || value > 30) stepErrors[field] = 'Commissione non valida';
+          if (!formData.fee || formData.fee < 10 || formData.fee > 30) stepErrors[field] = 'Commissione non valida';
           break;
         case 'refundPolicyId':
-          if (!value) stepErrors[field] = 'Politica rimborso richiesta';
+          if (!formData.refundPolicyId) stepErrors[field] = 'Politica rimborso richiesta';
           break;
         case 'availability':
-          if (!Array.isArray(value) || !value.some((day: unknown[]) => day.length > 0)) stepErrors[field] = 'Almeno un orario richiesto';
+          if (!Array.isArray(formData.availability) || !formData.availability.some(day => day.length > 0)) stepErrors[field] = 'Almeno un orario richiesto';
           break;
         case 'capacityPricing':
-          if (!Array.isArray(value) || value.length === 0) stepErrors[field] = 'Almeno una sala richiesta';
+          if (!Array.isArray(formData.capacityPricing) || formData.capacityPricing.length === 0) stepErrors[field] = 'Almeno una sala richiesta';
           break;
       }
     });
@@ -394,7 +392,7 @@ const LocationCreateWizard: FC = () => {
   const CurrentStepComponent = currentStepData.component;
 
   // Calculate step completion states
-  const stepStates = WIZARD_STEPS.map((step, index) => {
+  const stepStates = WIZARD_STEPS.map((_, index) => {
     if (index < currentStep) return 'completed';
     if (index === currentStep) return 'active';
     return 'disabled';

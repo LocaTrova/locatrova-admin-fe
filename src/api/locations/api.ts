@@ -6,7 +6,6 @@ import {
 } from '../common/types';
 import { validateId, validatePagination } from '../common/validation';
 import { apiGet, apiPost, apiDelete, fetchPaginatedData, uploadFile } from '../common/client';
-import { LocationAPIError } from '../common/errors';
 
 interface ProgressCallback {
 	(progress: number): void;

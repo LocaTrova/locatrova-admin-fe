@@ -1,22 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { getRefundPolicies } from '../../api/refund_policies/api';
-import RefundRulesList from './RefundRulesList';
+import { RefundPolicy } from '../../api/common/types';
 import './refund-policies.css';
 import { Link } from 'react-router-dom';
-
-interface RefundRule {
-  timeWindow: string;
-  refundPercentage: number;
-  notes: string;
-}
-
-interface RefundPolicy {
-  _id: string;
-  name: string;
-  bestFor: string;
-  hostTip: string;
-  refundRules: RefundRule[];
-}
 
 const RefundPoliciesPage: React.FC = () => {
   const [policies, setPolicies] = useState<RefundPolicy[]>([]);
@@ -52,9 +38,9 @@ const RefundPoliciesPage: React.FC = () => {
               <tr>
                 <th>ID</th>
                 <th>Name</th>
-                <th>Best For</th>
-                <th>Host Tip</th>
-                <th>Refund Rules</th>
+                <th>Description</th>
+                <th>Refund Percentage</th>
+                <th>Time Limit</th>
               </tr>
             </thead>
             <tbody>
@@ -62,10 +48,10 @@ const RefundPoliciesPage: React.FC = () => {
                 <tr key={policy._id}>
                   <td>{policy._id}</td>
                   <td>{policy.name}</td>
-                  <td>{policy.bestFor}</td>
-                  <td>{policy.hostTip}</td>
+                  <td>{policy.description}</td>
+                  <td>{policy.refundPercentage}%</td>
                   <td>
-                    <RefundRulesList rules={policy.refundRules} />
+                    {policy.timeLimit} hours
                   </td>
                 </tr>
               ))}

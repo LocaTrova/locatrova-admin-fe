@@ -13,14 +13,10 @@ interface BasicInfoStepProps {
 }
 
 interface AddressSuggestion {
-  place_name: string;
-  geometry: {
-    coordinates: [number, number];
-  };
-  context: Array<{
-    id: string;
-    text: string;
-  }>;
+  formattedAddress: string;
+  lat: number;
+  lng: number;
+  placeId?: string;
 }
 
 interface AddressSearchState {
@@ -70,35 +66,36 @@ const BasicInfoStep: FC<BasicInfoStepProps> = ({
 
   // Enhanced validation with real-time feedback
   const validateField = useCallback((field: string, value: unknown): string | null => {
+    const stringValue = value as string;
     switch (field) {
       case 'name':
-        if (!value || !value.trim()) return 'Il nome della location è obbligatorio';
-        if (value.length < 3) return 'Il nome deve essere di almeno 3 caratteri';
-        if (value.length > 100) return 'Il nome non può superare i 100 caratteri';
-        if (!/^[a-zA-ZÀ-ÿ0-9\s\-_.,'()]+$/.test(value)) return 'Il nome contiene caratteri non validi';
+        if (!stringValue || !stringValue.trim()) return 'Il nome della location è obbligatorio';
+        if (stringValue.length < 3) return 'Il nome deve essere di almeno 3 caratteri';
+        if (stringValue.length > 100) return 'Il nome non può superare i 100 caratteri';
+        if (!/^[a-zA-ZÀ-ÿ0-9\s\-_.,'()]+$/.test(stringValue)) return 'Il nome contiene caratteri non validi';
         return null;
       
       case 'address':
-        if (!value || !value.trim()) return 'L\'indirizzo è obbligatorio';
+        if (!stringValue || !stringValue.trim()) return 'L\'indirizzo è obbligatorio';
         if (!data.addressSelected) return 'Seleziona un indirizzo dalla lista dei suggerimenti';
         return null;
       
       case 'city':
-        if (!value || !value.trim()) return 'La città è obbligatoria';
-        if (value.length > 50) return 'Il nome della città è troppo lungo';
-        if (!/^[a-zA-ZÀ-ÿ\s\-']+$/.test(value)) return 'Il nome della città contiene caratteri non validi';
+        if (!stringValue || !stringValue.trim()) return 'La città è obbligatoria';
+        if (stringValue.length > 50) return 'Il nome della città è troppo lungo';
+        if (!/^[a-zA-ZÀ-ÿ\s\-']+$/.test(stringValue)) return 'Il nome della città contiene caratteri non validi';
         return null;
       
       case 'cap':
-        if (value && !/^\d{5}$/.test(value)) return 'Il CAP deve essere di 5 cifre';
+        if (stringValue && !/^\d{5}$/.test(stringValue)) return 'Il CAP deve essere di 5 cifre';
         return null;
       
       case 'description':
-        if (value && value.length > 1000) return 'La descrizione non può superare i 1000 caratteri';
+        if (stringValue && stringValue.length > 1000) return 'La descrizione non può superare i 1000 caratteri';
         return null;
       
       case 'rules':
-        if (value && value.length > 500) return 'Le regole non possono superare i 500 caratteri';
+        if (stringValue && stringValue.length > 500) return 'Le regole non possono superare i 500 caratteri';
         return null;
       
       default:
@@ -153,10 +150,10 @@ const BasicInfoStep: FC<BasicInfoStepProps> = ({
       
       if (signal.aborted) return;
 
-      if (response?.features && Array.isArray(response.features)) {
+      if (response && Array.isArray(response)) {
         setAddressState(prev => ({
           ...prev,
-          suggestions: response.features.slice(0, 5), // Limit to 5 suggestions
+          suggestions: response.slice(0, 5), // Limit to 5 suggestions
           isLoading: false,
           error: null
         }));
@@ -203,22 +200,17 @@ const BasicInfoStep: FC<BasicInfoStepProps> = ({
     let city = data.city || '';
     let cap = data.cap || '';
 
-    // Extract city and postal code from suggestion with better parsing
-    if (suggestion.context && Array.isArray(suggestion.context)) {
-      suggestion.context.forEach((c) => {
-        if (c.id?.startsWith('place.') && !city) {
-          city = c.text;
-        } else if (c.id?.startsWith('postcode.') && !cap) {
-          cap = c.text;
-        }
-      });
+    // Extract city from formatted address (simple approach - take the part after the first comma)
+    const addressParts = suggestion.formattedAddress.split(',');
+    if (addressParts.length > 1 && !city) {
+      city = addressParts[1].trim();
     }
 
     updateData({
-      address: suggestion.place_name,
+      address: suggestion.formattedAddress,
       city,
       cap,
-      coordinates: suggestion.geometry.coordinates,
+      coordinates: [suggestion.lng, suggestion.lat],
       addressSelected: true
     });
     
@@ -272,7 +264,7 @@ const BasicInfoStep: FC<BasicInfoStepProps> = ({
       case 'Enter':
         e.preventDefault();
         if (activeSuggestionIndex >= 0) {
-          handleSelectAddress(addressState.suggestions[activeSuggestionIndex], activeSuggestionIndex);
+          handleSelectAddress(addressState.suggestions[activeSuggestionIndex]);
         }
         break;
       
@@ -291,10 +283,24 @@ const BasicInfoStep: FC<BasicInfoStepProps> = ({
     // Also check our enhanced field validations
     const enhancedErrors: Record<string, string> = {};
     
-    ['name', 'address', 'city', 'cap', 'description', 'rules'].forEach(field => {
-      const error = validateField(field, (data as Record<string, unknown>)[field]);
-      if (error) enhancedErrors[field] = error;
-    });
+    // Validate individual fields
+    const nameError = validateField('name', data.name);
+    if (nameError) enhancedErrors.name = nameError;
+    
+    const addressError = validateField('address', data.address);
+    if (addressError) enhancedErrors.address = addressError;
+    
+    const cityError = validateField('city', data.city);
+    if (cityError) enhancedErrors.city = cityError;
+    
+    const capError = validateField('cap', data.cap);
+    if (capError) enhancedErrors.cap = capError;
+    
+    const descriptionError = validateField('description', data.description);
+    if (descriptionError) enhancedErrors.description = descriptionError;
+    
+    const rulesError = validateField('rules', data.rules);
+    if (rulesError) enhancedErrors.rules = rulesError;
 
     const allErrors = { ...validationResult.errors, ...enhancedErrors };
     
@@ -321,9 +327,9 @@ const BasicInfoStep: FC<BasicInfoStepProps> = ({
       case 'address':
         return data.address && data.addressSelected ? 'success' : '';
       case 'cap':
-        return value && /^\d{5}$/.test(value) ? 'success' : '';
+        return value && typeof value === 'string' && /^\d{5}$/.test(value) ? 'success' : '';
       default:
-        return value && value.trim() ? 'success' : '';
+        return value && typeof value === 'string' && value.trim() ? 'success' : '';
     }
   };
 
@@ -431,13 +437,13 @@ const BasicInfoStep: FC<BasicInfoStepProps> = ({
                     key={index}
                     ref={el => suggestionRefs.current[index] = el}
                     className={`address-suggestion ${index === activeSuggestionIndex ? 'active' : ''}`}
-                    onClick={() => handleSelectAddress(suggestion, index)}
+                    onClick={() => handleSelectAddress(suggestion)}
                     onMouseEnter={() => setActiveSuggestionIndex(index)}
                     role="option"
                     aria-selected={index === activeSuggestionIndex}
                     tabIndex={-1}
                   >
-                    {suggestion.place_name}
+                    {suggestion.formattedAddress}
                   </div>
                 ))
               ) : addressState.error ? (
