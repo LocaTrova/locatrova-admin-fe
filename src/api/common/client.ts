@@ -74,8 +74,8 @@ export async function makeApiRequest<T>(
   try {
     return await withTimeout(
       () => withRetry(async () => {
-        const response = await apiClient.request(endpoint, method, data);
-        return response.data as T;
+        const response = await apiClient.request(endpoint, method, data) as { data: T };
+        return response.data;
       }, opts.retries, opts.retryDelay),
       opts.timeout
     );

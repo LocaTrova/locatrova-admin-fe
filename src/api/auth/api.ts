@@ -25,8 +25,8 @@ export const logout = async (): Promise<void> => {
  * Checks if the user is authenticated
  */
 export const checkAuth = async (): Promise<AuthCheckResponse> => {
-  const response = await apiClient.request('/auth/check-auth', 'GET');
-  return response.data as AuthCheckResponse;
+  const response = await apiClient.request('/auth/check-auth', 'GET') as { data: AuthCheckResponse };
+  return response.data;
 };
 
 /**
