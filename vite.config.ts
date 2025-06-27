@@ -3,13 +3,7 @@ import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/locatrova-admin-fe/',
   plugins: [react()],
-  // server: {
-  //   host: true, // Needed for Docker/Render
-  //   port: 5173, // Default port
-  //   strictPort: true,
-  // },
   build: {
     outDir: 'dist',
     sourcemap: true,

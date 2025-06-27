@@ -24,7 +24,13 @@ class ApiClient {
 
   // Single Responsibility: Build base URL
   private buildBaseUrl(): string {
-    const apiUrl = import.meta.env.VITE_API_URL as string;
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    
+    // Debug logging for production issues
+    if (import.meta.env.PROD && !import.meta.env.VITE_API_URL) {
+      console.warn('VITE_API_URL is undefined in production. Using fallback.');
+    }
+    
     return `${apiUrl}/api`;
   }
 

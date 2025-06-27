@@ -29,6 +29,17 @@ vite-frontend/
 └── vite.config.ts         # Vite configuration
 ```
 
+### Environment Variables
+
+Create the following environment files:
+
+- `.env` - Development environment (already created)
+- `.env.production` - Production environment (already created)
+- `.env.local` - Local overrides (optional)
+
+Required environment variables:
+- `VITE_API_URL` - The API base URL (e.g., `https://api.locatrova.it`)
+
 ### Installation  
 
 ```bash  
