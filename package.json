@@ -13,7 +13,7 @@
     "deploy": "gh-pages -d dist"
   },
   "engines": {
-    "node": "23.11.0"
+    "node": "22.15.0"
   },
   "dependencies": {
     "@types/lodash": "^4.17.15",
