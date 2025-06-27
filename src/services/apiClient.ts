@@ -1,11 +1,12 @@
 import tokenService from './tokenService';
+import dotenv from 'dotenv';
 
-let API_URL = 'http://localhost:3000/api';
+dotenv.config();
+const API_URL = `${process.env.VITE_API_URL}api`;
 
-if (import.meta.env.VITE_API_URL !== undefined) {
-  API_URL = `${import.meta.env.VITE_API_URL}/api`;
+if (!API_URL) {
+  throw new Error('VITE_API_URL is not defined');
 }
-
 
 interface ApiClientOptions {
   requiresAuth?: boolean;

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login, checkAuth } from '../../api/auth/api.ts';
 import './login.css';
 
-function LoginPage() {
+const LoginPage: React.FC = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -34,13 +34,13 @@ function LoginPage() {
     verifyAuthentication();
   }, [navigate]);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = useCallback(async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
     setIsSubmitting(true);
     
     try {
-      await login(formData.email, formData.password);
+      await login(formData.email.trim(), formData.password);
       navigate('/', { replace: true });
     } catch (error) {
       console.error('Login Error: ', error);
@@ -48,15 +48,19 @@ function LoginPage() {
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [formData.email, formData.password, navigate]);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target as HTMLInputElement;
+  const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
-  };
+    // Clear error when user starts typing
+    if (error) {
+      setError(null);
+    }
+  }, [error]);
 
   if (isLoading) {
     return (
@@ -115,9 +119,9 @@ function LoginPage() {
               <button
                 type="button"
                 className="password-toggle"
-                onClick={() => setShowPassword(!showPassword)}
+                onClick={() => setShowPassword(prev => !prev)}
                 aria-label={showPassword ? "Nascondi password" : "Mostra password"}
-                tabIndex={0}
+                disabled={isSubmitting}
               >
                 {showPassword ? (
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -145,7 +149,7 @@ function LoginPage() {
           <button 
             type="submit" 
             className="login-button"
-            disabled={isSubmitting || !formData.email || !formData.password}
+            disabled={isSubmitting || !formData.email.trim() || !formData.password}
             aria-busy={isSubmitting}
           >
             {isSubmitting ? (
