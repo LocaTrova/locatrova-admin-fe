@@ -1,12 +1,4 @@
 import tokenService from './tokenService';
-import dotenv from 'dotenv';
-
-dotenv.config();
-const API_URL = `${process.env.VITE_API_URL}api`;
-
-if (!API_URL) {
-  throw new Error('VITE_API_URL is not defined');
-}
 
 interface ApiClientOptions {
   requiresAuth?: boolean;
@@ -14,6 +6,13 @@ interface ApiClientOptions {
 }
 
 class ApiClient {
+  private baseUrl: string;
+
+  constructor() {
+    const apiUrl = import.meta.env.VITE_API_URL;
+    this.baseUrl = `${apiUrl}api`;
+  }
+
   public async request(
     endpoint: string,
     method: string = 'GET',
@@ -44,7 +43,7 @@ class ApiClient {
       body: data instanceof FormData ? data : data ? JSON.stringify(data) : undefined,
     };
 
-    const response = await fetch(`${API_URL}${endpoint}`, config);
+    const response = await fetch(`${this.baseUrl}${endpoint}`, config);
     
     // Skip token refresh for login endpoint
     if (response.status === 401 && !endpoint.includes('/login')) {
@@ -52,7 +51,7 @@ class ApiClient {
         const refreshed = await this.refreshToken();
         if (refreshed) {
           headers['Authorization'] = `Bearer ${tokenService.getAccessToken()}`;
-          const retryResponse = await fetch(`${API_URL}${endpoint}`, {
+          const retryResponse = await fetch(`${this.baseUrl}${endpoint}`, {
             ...config,
             headers,
           });
@@ -85,7 +84,7 @@ class ApiClient {
     if (!refreshToken) return false;
 
     try {
-      const response = await fetch(`${API_URL}/auth/refresh-token`, {
+      const response = await fetch(`${this.baseUrl}/auth/refresh-token`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
