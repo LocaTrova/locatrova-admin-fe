@@ -3,7 +3,6 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://Locatrova.github.io/locatrova-admin-fe/",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -13,9 +12,12 @@
     "predeploy": "tsc -b && vite build",
     "deploy": "gh-pages -d dist"
   },
+  "engines": {
+    "node": "23.11.0"
+  },
   "dependencies": {
     "@types/lodash": "^4.17.15",
-    "dotenv": "^16.6.0",
+    "dotenv": "^16.6.0",  
     "gh-pages": "^6.3.0",
     "lodash": "^4.17.21",
     "react": "^18.3.1",
